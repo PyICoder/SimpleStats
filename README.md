@@ -1,5 +1,5 @@
 # SimpleStats
-A no-bullshit in-game stats viewer.
+A simple in-game hypixel stats viewer.
 
 Replaces the default /stats command with a much more informative text-based version:  
 ![Stats Image 1](https://i.imgur.com/8znoeTO.png)  
