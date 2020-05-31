@@ -43,33 +43,39 @@ class StatsCommand extends CommandBase {
         if (player == null) { Utils.error("Invalid player.", prefix = true); api.shutdown(); return }
 
         if (args.length == 1) {
-          Utils.breakline()
-          firstLine(player)
-          printStat("Hypixel Level", try {
+          val hypixellevel= try {
             ILeveling.getLevel(player.get("networkExp").getAsDouble).toInt
           } catch {
-            case _: NullPointerException => 1
-          })
-          printStat("Achievement Points", player.get("achievementPoints"))
-          printStat("Karma", player.get("karma"))
-          printStat("Discord", try {
+            case _: NullPointerException => 1}
+          val achepoint = player.get("achievementPoints")
+          val karma = player.get("karma")
+          val discord = try {
             player.get("socialMedia").getAsJsonObject.get("links").getAsJsonObject.get("DISCORD").getAsString
           } catch {
             case _: NullPointerException => null
-          })
-          // https://steveridout.github.io/mongo-object-time/
-          printStat("First Login",
-            Utils.parseTime(new BigInteger(player.get("_id").getAsString.substring(0, 8), 16).longValue*1000))
-          printStat("Last Login", try {
+          }
+          val firstlogin =
+            Utils.parseTime(new BigInteger(player.get("_id").getAsString.substring(0, 8), 16).longValue * 1000)
+          val lastlogin =  try {
             Utils.parseTime(player.get("lastLogin").getAsLong)
           } catch {
             case _: NullPointerException => "Hidden"
-          })
-          printStat("Online", try {
+          }
+          val isonline = try {
             player.get("lastLogin").getAsLong > player.get("lastLogout").getAsLong
           } catch {
             case _: NullPointerException => false
-          })
+          }
+          Utils.breakline()
+          firstLine(player)
+          printStat("Hypixel Level", hypixellevel)
+          printStat("Achievement Points", achepoint)
+          printStat("Karma", karma)
+          printStat("Discord", discord)
+          // https://steveridout.github.io/mongo-object-time/
+          printStat("First Login", firstlogin)
+          printStat("Last Login", lastlogin)
+          printStat("Online", isonline)
           Utils.breakline()
         } else {
           if (!player.has("stats")) {
