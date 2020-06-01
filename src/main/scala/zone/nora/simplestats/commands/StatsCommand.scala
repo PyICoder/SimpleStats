@@ -501,13 +501,11 @@ class StatsCommand extends CommandBase {
         val jp = j.getAsInt
             val formatter = java.text.NumberFormat.getIntegerInstance
             val he = formatter.format(jp)
-            println(s"$he")
             s"$he"
     }
 
     val statColour = s"\u00a7${f(value)}"
     val done = try y(value) catch {case e: Exception => value}
-        println(s"$value")
         Utils.put(s"$name: ${if (value == null) "\u00a7cN/A" else s"$statColour$done"}")
       }
 }
