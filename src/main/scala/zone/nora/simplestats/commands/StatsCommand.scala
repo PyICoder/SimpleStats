@@ -29,7 +29,10 @@ class StatsCommand extends CommandBase {
           Utils.breakline()
           return
         }
-        if (args.isEmpty) { Utils.error("/stats [player] [game]", prefix = true); return }
+        if (args.isEmpty) {
+          Utils.error("/stats [player] [game]", prefix = true)
+          return
+        }
 
         val api = new HypixelAPI(UUID.fromString(SimpleStats.apiKey))
         val playerReply = api.getPlayerByName(args(0)).get()
@@ -40,13 +43,18 @@ class StatsCommand extends CommandBase {
         }
 
         val player = playerReply.getPlayer
-        if (player == null) { Utils.error("Invalid player.", prefix = true); api.shutdown(); return }
+        if (player == null) {
+          Utils.error("Invalid player.", prefix = true)
+          api.shutdown()
+          return
+        }
 
         if (args.length == 1) {
-          val hypixellevel= try {
+          val hypixellevel = try {
             ILeveling.getLevel(player.get("networkExp").getAsDouble).toInt
           } catch {
-            case _: NullPointerException => 1}
+            case _: NullPointerException => 1
+          }
           val achepoint = player.get("achievementPoints")
           val karma = player.get("karma")
           val discord = try {
@@ -56,7 +64,7 @@ class StatsCommand extends CommandBase {
           }
           val firstlogin =
             Utils.parseTime(new BigInteger(player.get("_id").getAsString.substring(0, 8), 16).longValue * 1000)
-          val lastlogin =  try {
+          val lastlogin = try {
             Utils.parseTime(player.get("lastLogin").getAsLong)
           } catch {
             case _: NullPointerException => "Hidden"
@@ -85,12 +93,25 @@ class StatsCommand extends CommandBase {
           args(1).toLowerCase match {
             case "arc" | "arcade" =>
               val arcade = getGameStats(player, "Arcade")
-              if (arcade == null) { api.shutdown(); return }
+              if (arcade == null) {
+                api.shutdown()
+                return
+              }
               firstLine(player, "Arcade")
               printStat("Coins", arcade.get("coins").getAsInt)
+              Minecraft.getMinecraft.thePlayer.addChatMessage(
+                ChatComponentBuilder.of("\u00a7aClick to view all stats on \u00a73plancke.io")
+                  .setHoverEvent(s"Click here to view all stats of ${player.get("displayname").getAsString} on plancke.io")
+                  .setClickEvent(
+                    ClickEvent.Action.OPEN_URL,
+                    s"https://plancke.io/hypixel/player/stats/${player.get("uuid").getAsString}#Arcade"
+                  ).build)
             case "ab" | "arena" | "arenabrawl" =>
               val arena = getGameStats(player, "Arena")
-              if (arena == null) { api.shutdown(); return }
+              if (arena == null) {
+                api.shutdown()
+                return
+              }
               firstLine(player, "Arena Brawl")
               printStat("1v1 Wins", arena.get("wins_1v1"))
               printStat("2v2 Wins", arena.get("wins_2v2"))
@@ -104,10 +125,15 @@ class StatsCommand extends CommandBase {
                 printStat("Utility Skill", arena.get("utility").getAsString.replace("_", " "))
                 printStat("Support Skill", arena.get("support").getAsString.replace("_", " "))
                 printStat("Ultimate Skill", arena.get("ultimate").getAsString.replace("_", " "))
-              } catch { case _: NullPointerException => /* ignored */ }
+              } catch {
+                case _: NullPointerException => /* ignored */
+              }
             case "wl" | "bg" | "warlords" | "battleground" =>
               val bg = getGameStats(player, "Battleground")
-              if (bg == null) { api.shutdown(); return }
+              if (bg == null) {
+                api.shutdown()
+                return
+              }
               firstLine(player, "Warlords")
               printStat("Kills", bg.get("kills"))
               printStat("Assists", bg.get("assists"))
@@ -120,7 +146,10 @@ class StatsCommand extends CommandBase {
               printStat("Warrior Level", Utils.getWarlordsClassLevel(bg, "warrior"))
             case "bw" | "bedwars" =>
               val bw = getGameStats(player, "Bedwars")
-              if (bw == null) { api.shutdown(); return }
+              if (bw == null) {
+                api.shutdown()
+                return
+              }
               val achievements = player.get("achievements").getAsJsonObject
               firstLine(player, "BedWars")
               printStat("Level", achievements.get("bedwars_level"))
@@ -133,7 +162,10 @@ class StatsCommand extends CommandBase {
               printStat("Coins", bw.get("coins"))
             case "bb" | "build" | "buildbattle" =>
               val bb = getGameStats(player, "BuildBattle")
-              if (bb == null) { api.shutdown(); return }
+              if (bb == null) {
+                api.shutdown()
+                return
+              }
               firstLine(player, "Build Battle")
               printStat("Wins", bb.get("wins"))
               printStat("Score", bb.get("score"))
@@ -142,7 +174,10 @@ class StatsCommand extends CommandBase {
               printStat("Correct GTB Guesses", bb.get("correct_guesses"))
             case "duels" =>
               val duels = getGameStats(player, "Duels")
-              if (duels == null) { api.shutdown(); return }
+              if (duels == null) {
+                api.shutdown()
+                return
+              }
               firstLine(player, "Duels")
               printStat("Wins", duels.get("wins"))
               printStat("Losses", duels.get("losses"))
@@ -152,7 +187,10 @@ class StatsCommand extends CommandBase {
               printStat("Winstreak", duels.get("current_winstreak"))
             case "tkr" | "turbo" | "turbokartracers" | "gingerbread" =>
               val tkr = getGameStats(player, "GingerBread")
-              if (tkr == null) { api.shutdown(); return }
+              if (tkr == null) {
+                api.shutdown()
+                return
+              }
               firstLine(player, "Turbo Kart Racers")
               printStat("Gold Trophies", tkr.get("gold_trophy"))
               printStat("Silver Trophies", tkr.get("silver_trophy"))
@@ -160,7 +198,10 @@ class StatsCommand extends CommandBase {
               printStat("Coins", tkr.get("coins"))
             case "blitz" | "bsg" | "sg" | "hg" | "hungergames" =>
               val bsg = getGameStats(player, "HungerGames")
-              if (bsg == null) { api.shutdown(); return }
+              if (bsg == null) {
+                api.shutdown()
+                return
+              }
               firstLine(player, "Blitz Survival Games")
               printStat("Kills", bsg.get("kills"))
               printStat("Wins", bsg.get("wins"))
@@ -175,7 +216,10 @@ class StatsCommand extends CommandBase {
               printStat("Lifetime Tokens", legacy.get("total_tokens"))
             case "cvc" | "cac" | "copsandcrims" | "mcgo" =>
               val cvc = getGameStats(player, "MCGO")
-              if (cvc == null) { api.shutdown(); return }
+              if (cvc == null) {
+                api.shutdown()
+                return
+              }
               firstLine(player, "CVC")
               printStat("Defusal Kills", cvc.get("kills"))
               printStat("Defusal Round Wins", cvc.get("round_wins"))
@@ -187,7 +231,10 @@ class StatsCommand extends CommandBase {
               printStat("Coins", cvc.get("coins"))
             case "pb" | "paintball" =>
               val pb = getGameStats(player, "Paintball")
-              if (pb == null) { api.shutdown(); return }
+              if (pb == null) {
+                api.shutdown()
+                return
+              }
               firstLine(player, "Paintball")
               printStat("Kills", pb.get("kills"))
               printStat("Wins", pb.get("wins"))
@@ -197,7 +244,10 @@ class StatsCommand extends CommandBase {
             case "pit" => Utils.error("Stats lookup for The Pit is coming soon (tm)")
             case "q" | "quake" | "quakecraft" =>
               val q = getGameStats(player, "Quake")
-              if (q == null) { api.shutdown(); return }
+              if (q == null) {
+                api.shutdown()
+                return
+              }
               firstLine(player, "Quake")
               printStat("Solo Kills", q.get("kills"))
               printStat("Solo Wins", q.get("wins"))
@@ -208,7 +258,10 @@ class StatsCommand extends CommandBase {
             case "sb" | "skyblock" => Utils.error("Stats lookup for SkyBlock are coming soon (tm)")
             case "sw" | "skywars" =>
               val sw = getGameStats(player, "SkyWars")
-              if (sw == null) { api.shutdown(); return }
+              if (sw == null) {
+                api.shutdown()
+                return
+              }
               firstLine(player, "SkyWars")
               printStat("Kills", sw.get("kills"))
               printStat("Wins", sw.get("wins"))
@@ -229,7 +282,10 @@ class StatsCommand extends CommandBase {
               printStat("Heads", sw.get("heads"))
             case "suhc" | "speed" | "speeduhc" =>
               val suhc = getGameStats(player, "SpeedUHC")
-              if (suhc == null) { api.shutdown(); return }
+              if (suhc == null) {
+                api.shutdown()
+                return
+              }
               firstLine(player, "Speed UHC")
               printStat("Kills", suhc.get("kills"))
               printStat("Wins", suhc.get("deaths"))
@@ -237,11 +293,16 @@ class StatsCommand extends CommandBase {
               printStat("Coins", suhc.get("coins"))
               try {
                 printStat("Selected Mastery", suhc.get("activeMasteryPerk").getAsString.split("_")(1))
-              } catch { case _: Exception => /* ignored */ }
+              } catch {
+                case _: Exception => /* ignored */
+              }
               printStat("Winstreak", suhc.get("winstreak"))
             case "sh" | "smash" | "supersmash" | "smashheroes" =>
               val sh = getGameStats(player, "SuperSmash")
-              if (sh == null) { api.shutdown(); return }
+              if (sh == null) {
+                api.shutdown()
+                return
+              }
               firstLine(player, "Smash Heroes")
               printStat("Kills", sh.get("kills"))
               printStat("Wins", sh.get("wins"))
@@ -253,7 +314,10 @@ class StatsCommand extends CommandBase {
               printStat("Active Class", s"$activeClass (P$prestige Lv$level)")
             case "tnt" | "tntgames" =>
               val tnt = getGameStats(player, "TNTGames")
-              if (tnt == null) { api.shutdown(); return }
+              if (tnt == null) {
+                api.shutdown()
+                return
+              }
               firstLine(player, "TNT Games")
               printStat("TNT Run Wins", tnt.get("wins_tntrun"))
               printStat("PVP Run Wins", tnt.get("win_pvprun"))
@@ -263,7 +327,10 @@ class StatsCommand extends CommandBase {
               printStat("Coins", tnt.get("coins"))
             case "tc" | "cw" | "crazywalls" | "truecombat" =>
               val cw = getGameStats(player, "TrueCombat")
-              if (cw == null) { api.shutdown(); return }
+              if (cw == null) {
+                api.shutdown()
+                return
+              }
               firstLine(player, "Crazy Walls")
               printStat("Kills", cw.get("kills"))
               printStat("Wins", cw.get("wins"))
@@ -273,7 +340,10 @@ class StatsCommand extends CommandBase {
               printStat("Gold Dust", cw.get("gold_dust"))
             case "uhc" =>
               val uhc = getGameStats(player, "UHC")
-              if (uhc == null) { api.shutdown(); return }
+              if (uhc == null) {
+                api.shutdown()
+                return
+              }
               firstLine(player, "UHC")
               printStat("Kills", uhc.get("kills"))
               printStat("Wins", uhc.get("wins"))
@@ -283,10 +353,15 @@ class StatsCommand extends CommandBase {
               printStat("Heads Eaten", uhc.get("heads_eaten"))
               try {
                 printStat("Selected Kit", uhc.get("equippedKit").getAsString)
-              } catch { case _: Exception => /* ignored */ }
+              } catch {
+                case _: Exception => /* ignored */
+              }
             case "vz" | "vampz" | "vampirez" =>
               val vz = getGameStats(player, "VampireZ")
-              if (vz == null) { api.shutdown(); return }
+              if (vz == null) {
+                api.shutdown()
+                return
+              }
               firstLine(player, "VampireZ")
               printStat("Human Wins", vz.get("human_wins"))
               printStat("Vampire Wins", vz.get("vampire_wins"))
@@ -294,7 +369,10 @@ class StatsCommand extends CommandBase {
               printStat("Coins", vz.get("coins"))
             case "walls" =>
               val walls = getGameStats(player, "Walls")
-              if (walls == null) { api.shutdown(); return }
+              if (walls == null) {
+                api.shutdown()
+                return
+              }
               firstLine(player, "Walls")
               printStat("Kills", walls.get("kills"))
               printStat("Wins", walls.get("wins"))
@@ -303,7 +381,10 @@ class StatsCommand extends CommandBase {
               printStat("Insane Farmer", walls.get("insane_farmer"))
             case "walls3" | "mw" | "mega" | "megawalls" =>
               val mw = getGameStats(player, "Walls3")
-              if (mw == null) { api.shutdown(); return }
+              if (mw == null) {
+                api.shutdown()
+                return
+              }
               firstLine(player, "Mega Walls")
               printStat("Kills", mw.get("kills"))
               printStat("Wins", mw.get("wins"))
@@ -390,7 +471,11 @@ class StatsCommand extends CommandBase {
 
   private def firstLine(player: JsonObject, game: String = "", guild: Boolean = false): Unit = {
     val s = if (game == "" && !guild) "Stats" else if (guild) "Guild" else s"$game stats"
-    val rank = try { Utils.getRank(player) } catch { case e: Exception => e.printStackTrace(); "" }
+    val rank = try {
+      Utils.getRank(player)
+    } catch {
+      case e: Exception => e.printStackTrace(); ""
+    }
     Utils.put(s"$s of ${if (rank.endsWith("]")) s"$rank " else rank}${player.get("displayname").getAsString}")
   }
 
@@ -409,7 +494,20 @@ class StatsCommand extends CommandBase {
         else if (jp.isString) '7'
       case _ => '6'
     }
+
+    def y[T](v: T) = v match {
+      case _: Number => v
+      case j: JsonElement =>
+        val jp = j.getAsInt
+            val formatter = java.text.NumberFormat.getIntegerInstance
+            val he = formatter.format(jp)
+            println(s"$he")
+            s"$he"
+    }
+
     val statColour = s"\u00a7${f(value)}"
-    Utils.put(s"$name: ${if (value == null) "\u00a7cN/A" else s"$statColour$value"}")
-  }
+    val done = try y(value) catch {case e: Exception => value}
+        println(s"$value")
+        Utils.put(s"$name: ${if (value == null) "\u00a7cN/A" else s"$statColour$done"}")
+      }
 }
