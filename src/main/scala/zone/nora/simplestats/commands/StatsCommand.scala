@@ -494,18 +494,13 @@ class StatsCommand extends CommandBase {
         else if (jp.isString) '7'
       case _ => '6'
     }
-
-    def y[T](v: T) = v match {
-      case _: Number => v
-      case j: JsonElement =>
-        val jp = j.getAsInt
-            val formatter = java.text.NumberFormat.getIntegerInstance
-            val he = formatter.format(jp)
-            s"$he"
+    def y(value: String): String ={
+      val digits = "\\d+".r.unanchored
+      val t =digits.replaceAllIn(value, m => f"${m.group(0).toInt}%,d")
+      t
     }
-
     val statColour = s"\u00a7${f(value)}"
-    val done = try y(value) catch {case e: Exception => value}
-        Utils.put(s"$name: ${if (value == null) "\u00a7cN/A" else s"$statColour$done"}")
-      }
+    val done = try y(value.toString) catch {case e: Exception => value}
+    Utils.put(s"$name: ${if (value == null) "\u00a7cN/A" else s"$statColour$done"}")
+  }
 }
