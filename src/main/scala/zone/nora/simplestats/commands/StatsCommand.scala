@@ -415,7 +415,25 @@ class StatsCommand extends CommandBase {
         else if (jp.isString) '7'
       case _ => '6'
     }
+    def y(value: String): String = {
+      if (value.contains("/")) value
+      else if (value.contains("#")) value
+      else {
+      val digits = "\\d+.\\d+".r.unanchored
+      val t = digits.replaceAllIn(value, m =>
+        if (m.group(0) contains (".")) {
+          val formatter = java.text.NumberFormat.getInstance
+          formatter.format(m.group(0).toDouble)
+        }
+        else {
+          f"${m.group(0).toInt}%,d"
+        }
+      )
+      t
+    }
+    }
     val statColour = s"\u00a7${f(value)}"
-    lines.append(s"$name: ${if (value == null) "\u00a7cN/A" else s"$statColour$value"}")
+    val done = y(value.toString)
+    lines.append(s"$name: ${if (value == null) "\u00a7cN/A" else s"$statColour$done"}")
   }
-}
+  }
